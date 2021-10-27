@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  blog:
+    image: ntuca2020/hw2
+    container_name: ca_hw2
+    volumes:
+      - ./Examples:/root/Examples
+      - ./Problems:/root/Problems
+    stdin_open: true
+    tty: true
+    command: /bin/bash
