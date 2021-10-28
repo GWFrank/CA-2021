@@ -23,3 +23,23 @@ f = *(A+1) + A;
 
 ### 2.16.1
 
+`funct7`, `funct3`, `opcode`: These bit fields might increase in size to accommodate the four times as many instructions.
+
+`rs2`, `rs1`, `rd`: These bit fields should increase from 5 bits to 7 bits for the 128 registers.
+
+### 2.16.2
+
+`funct3`, `opcode`: These bit fields might increase in size to accommodate the four times as many instructions.
+
+`rs1`, `rd`: These bit fields should increase from 5 bits to 7 bits for the 128 registers.
+
+`imm`: This field doesn't need to change, because neither the number of registers or instructions have to do with `imm`.
+
+### 2.16.3
+
+Decrease in size: Because there are more registers and more instructions, some old instructions can now be combined into just a single instruction.
+
+Increase in size: Because instructions now takes up more bits, for simple tasks that doesn't use many registers, the extra bits are wasted and take up unnecessary spaces.
+
+
+
