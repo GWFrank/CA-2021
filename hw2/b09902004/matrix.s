@@ -28,8 +28,6 @@ matrix_mul:
     add s11, zero, a1 # s11 = &B = b_ptr
     addi t4, zero, 1;
     slli t4, t4, 15; # (128*128)*2 bytes
-    # addi t5, zero, 1;
-    # slli t5, t5, 10; # 1024
     add t0, zero, zero # i=0
 loopi:
     add t1, zero, zero # j=0
@@ -54,7 +52,6 @@ loopk:
     mulw t3, s4, s6 # A[i][k]*B[k][j]
     addw s0, s0, t3 # acc00 += A[i][k]*B[k][j]
     andi s0, s0, 1023 # acc00 = acc00%1024 = last 10 bits
-    # rem s0, s0, t5
     mulw t3, s4, s7 # A[i][k]*B[k][j+1]
     addw s1, s1, t3 # acc01 += A[i][k]*B[k][j+1]
     andi s1, s1, 1023 # acc01 = acc01%1024 = last 10 bits
