@@ -56,37 +56,20 @@ Increase in size: Because instructions now takes up more bits, for simple tasks 
 > https://en.wikipedia.org/wiki/Loop_nest_optimization
 > https://github.com/flame/how-to-optimize-gemm/wiki
 
-Result: `8960429 cycles`
+### Result
+
+Cycle count: `5630353`
+
+![sub6](sub6.png)
 
 ### Strategy
 
-![matrix_mul](matrix_mul.png)
-
-- Dot $2$ rows of $A$ and $4$ columns of $B$ at a time, so that when a value from $A$ or $B$ is read from memory to register, it can be used multiple times.
-- Use pointers and indirect addressing to access $A$ and $B$.
+- Dot $4$ rows of $A$ and $4$ columns of $B$ at a time, so that when a value from $A$ or $B$ is read from memory to register, it can be used multiple times.
+  ![matrix_mul](matrix_mul.png)
+- Use pointers and indirect addressing to access $A$, $B$, and $C$.
+- Only do the modulo operation before storing to $C$, because we are using `unsigned short`, and overflows in `unsigned` variables are essentially modulo.
+- In the `for` loop of `k`, do two iterations at once, reducing call for branching operations.
+- When inside the `for` loop of `i`, put `i` from register to stack, and use this register for as temporary register for calculation.
 - I tried memory blocking to keep data in L1 and L2 cache, but somehow it didn't work, and the performance is even worse.
-
-### Questions
-
-**How many cycles does it take by just doing the naive matrix multiplication?**
-
-The naive C implementation with gcc `-O3` optimization takes slightly more than 16M cycles.
-
-**How many load and store does it need (roughly) during the whole computation? (Considering the**
-**registers it use)**
-
-In the naive implementation, $C$ is stored once, $A$ and $B$ are both loaded into register $128$ times.
-So total store is about $2^{7\times2} = 2^{14}$ times and total load is about $2\times2^7\times2^{7\times2}=2^{22}$ times.
-
-With my strategy, $C$ is also stored once, $A$ is loaded $\frac{128}{4}=32$ times, and $B$ is loaded $\frac{128}{2} = 64$ times.
-So total store is $2^{14}$ times, and total load is $2^5\times2^{14}+2^6\times2^{14}=3\times2^{19}$ times, $\frac{3}{8}$ of naive implementation.
-
-**Is there any way to keep registers being used as much as possible before they’re replaced? (Hint:**
-**blocking)**
-
-Yes. My strategy is intended to keep reusing registers as much as possible. The number of rows and columns we dotted at a time is bounded by how many registers are available.
-
-**How many loop controls does it need (roughly) during the whole computation?**
-
-Both naive implementation and my strategy uses $3$ loop controls.
-
+- Registers are barely enough. Unrolling some loops could avoid the use of `gp`, `tp`, and `ra`.
+  ![reg_use](reg_use.png)
