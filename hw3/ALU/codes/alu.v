@@ -17,12 +17,14 @@ module alu #(
 
     parameter INT32_MAX = 2147483647;
     parameter INT32_MIN = -2147483648;
+    parameter UINT32_MAX = 32'hffffffff;
 
     // wires & registers
     wire signed [DATA_WIDTH-1:0] s_i_data_a, s_i_data_b;
     wire a_msb, b_msb, o_msb;
     reg [DATA_WIDTH-1:0] o_data_r, o_data_w;
-    reg signed [2*DATA_WIDTH-1:0] mul_tmp;
+    reg signed [2*DATA_WIDTH-1:0] s_mul_tmp;
+    reg [2*DATA_WIDTH-1:0] mul_tmp;
     reg o_overflow_r, o_overflow_w;
     reg o_valid_r, o_valid_w;
 
@@ -52,9 +54,9 @@ module alu #(
                     o_valid_w = 1;
                 end
                 4'd2: begin // signed mul
-                    mul_tmp = s_i_data_a * s_i_data_b;
+                    s_mul_tmp = s_i_data_a * s_i_data_b;
                     o_data_w = s_i_data_a * s_i_data_b;
-                    o_overflow_w = (mul_tmp>INT32_MAX || mul_tmp<INT32_MIN);
+                    o_overflow_w = (s_mul_tmp>INT32_MAX || s_mul_tmp<INT32_MIN);
                     o_valid_w = 1;
                 end
                 4'd3: begin // signed max
@@ -88,7 +90,10 @@ module alu #(
                     o_valid_w = 1;
                 end
                 4'd7: begin // unsigned mul
-                    {o_overflow_w, o_data_w} = i_data_a * i_data_b;
+                    mul_tmp = i_data_a * i_data_b;
+                    o_data_w = i_data_a * i_data_b;
+                    o_overflow_w = (mul_tmp>UINT32_MAX);
+                    o_valid_w = 1;
                     o_valid_w = 1;
                 end
                 4'd8: begin // unsigned max
