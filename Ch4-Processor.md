@@ -81,7 +81,7 @@
 
 ### Data hazard
 
-An instruction depends on data from previous instructions.
+An instruction depends on data from previous instructions + read after write(RAW).
 
 ```assembly
 add x19, x0, x1
@@ -109,7 +109,7 @@ sub x2, x19, x3
   - MEM/WB.RegRd = ID/EX.RegRs2
 - Only forward if the instruction is writing to register.
   - EX/MEM.RegWrite
-  - MEM/WB.RegRd
+  - MEM/WB.RegWrite
 - And only if that instruction's Rd $\ne$ 0
 
 **Double data hazard**
@@ -128,8 +128,8 @@ add x1, x1, x4
 - Check when using instruction is decoded in ID stage.
 - Load-use hazard when:
   - ID/EX.MemRead and
-    (ID/EX.RegisterRd = IF/ID RegisterRs1
-    or ID/EX.RegisterRd = IF/ID RegisterRs2)
+    (ID/EX.RegRd = IF/ID RegRs1
+    or ID/EX.RegRd = IF/ID RegRs2)
 - If detected, stall and insert bubble (nop)
 - To stall pipeline:
   - Force control values in ID/EX register to 0
@@ -138,7 +138,8 @@ add x1, x1, x4
     - Decode using instruction again
     - Fetch the following instruction again
     - 1-cycle stall allows mem to read data for `ld`
-- 
+
+
 
 
 #### Code scheduling
@@ -153,6 +154,9 @@ Reorder code to avoid using load result in the next instruction.
   - Fetching next instruction depends on branch output.
   - Pipeline can't always fetch correct instruction.
 - Need to compare and compute target early in the pipeline.
+- Move the needed hardware for determining outcome to ID stage.
+  - Target address adder * register comparator
+
 
 #### Stall on branch
 
@@ -168,9 +172,19 @@ Wait until branch outcome.
 - Static branch prediction
   - Based on typical branch behavior.
   - Example: loop & if branches
-- Dynamic branch prediction
-  - Use recent history to predict.
-  - Assume future behaviors continue the trend.
+
+#### Dynamic branch prediction
+
+- Use recent history to predict. Assume future behaviors continue the trend.
+- Branch prediction buffer / history table
+- Indexed by "recent branch instruction's address"
+- Stores that out come (taken / not taken)
+- To execute
+  1. Check buffer, guess the same outcome.
+  2. Start fetching.
+  3. If wrong, flush pipeline and flip prediction.
+- 2-bit predictor
+  - Only change prediction on two successive misses.
 
 ### Datapath + control
 

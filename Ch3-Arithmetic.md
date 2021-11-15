@@ -55,9 +55,7 @@ Bias = 127 (single) or 1023 (double)
 ### Denormal numbers, Infinity, NaN
 
 - Exponent are all zeroes $\Rightarrow$ hidden bit is 0
-  $$
-  x = {(-1)}^{\text{Sign}} \times (0+\text{Fraction})\times2^{\text{$-$ Bias}}
-  $$
+  $x = {(-1)}^{\text{Sign}} \times (0+\text{Fraction})\times2^{\text{$-$ Bias}}$
 
 - Two representation for 0 ($\pm0.0$).
 
