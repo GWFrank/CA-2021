@@ -13,8 +13,6 @@ module alu #(
     output                  o_valid
 );
 
-    // homework
-
     parameter INT32_MAX = 2147483647;
     parameter INT32_MIN = -2147483648;
     parameter UINT32_MAX = 32'hffffffff;
