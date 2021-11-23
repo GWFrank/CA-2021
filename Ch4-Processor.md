@@ -81,7 +81,7 @@
 
 ### Data hazard
 
-An instruction depends on data from previous instructions + read after write(RAW).
+An instruction depends on data from previous instructions (data dependency) + read after write(RAW).
 
 ```assembly
 add x19, x0, x1
