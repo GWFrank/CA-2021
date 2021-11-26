@@ -1,3 +1,4 @@
+#/bin/bash
 iverilog -D T0 -f cpu.f
 vvp ./a.out
 iverilog -D T1 -f cpu.f
