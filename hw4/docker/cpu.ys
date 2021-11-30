@@ -1,7 +1,5 @@
 ### Read verilog files
 read_verilog ./codes/cpu.v
-read_verilog ./codes/moduleA.v
-read_verilog ./codes/moduleB.v
 # include all your *.v files here except data_memory.v, 
 # instruction_memory.v and testbench.v
 
