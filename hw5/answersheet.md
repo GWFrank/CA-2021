@@ -569,9 +569,66 @@ Assumptions:
      |   0   |   -   |          -           |           -            |
      |   1   | `0x3` |         `6`          |          `2`           |
 
-## 5.16.5
+### 5.16.5
 
 Without TLB, a virtual memory access would search through the page table to find physical page number. When there is a TLB, because of temporal locality, a large portion of accesses don't have to search through the entire page table, which can be large for high performance systems with many memory.
 
+## 6.7
 
+### 6.7.1
 
+| `(w, x, y, z)` | Execution Order                                              |
+| -------------- | ------------------------------------------------------------ |
+| `(5, 2, 2, 4)` | `1 -> 2 -> 3 -> 4`<br />`1 -> 2 -> 4 -> 3`<br />`2 -> 1 -> 3 -> 4`<br />`2 -> 1 -> 4 -> 3` |
+| `(3, 2, 2, 4)` | `1 -> 3 -> 2 -> 4`<br />`2 -> 3 -> 1 -> 4`                   |
+| `(3, 2, 2, 2)` | `1 -> 3 -> 4 -> 2`<br />`1 -> 4 -> 3 -> 2`<br />`2 -> 3 -> 4 -> 1`<br />`2 -> 4 -> 3 -> 1` |
+| `(5, 2, 2, 2)` | `1 -> 4 -> 2 -> 3`<br />`2 -> 4 -> 1 -> 3`                   |
+| `(1, 2, 2, 4)` | `3 -> 1 -> 2 -> 4`<br />`3 -> 2 -> 1 -> 4`                   |
+| `(1, 2, 2, 2)` | `3 -> 1 -> 4 -> 2`<br />`3 -> 2 -> 4 -> 1`                   |
+| `(0, 2, 2, 0)` | `3 -> 4 -> 1 -> 2`<br />`3 -> 4 -> 2 -> 1`<br />`4 -> 3 -> 1 -> 2`<br />`4 -> 3 -> 2 -> 1` |
+| `(5, 2, 2, 0)` | `4 -> 1 -> 2 -> 3`<br />`4 -> 2 -> 1 -> 3`                   |
+| `(3, 2, 2, 0)` | `4 -> 1 -> 3 -> 2`<br />`4 -> 2 -> 3 -> 1`                   |
+
+### 6.7.2
+
+Use signals and mutexes to synchronize between threads and processes.
+
+## 6.9
+
+### 6.9.1
+
+| FU \ Cycle | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    |
+| ---------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| 1          | A1   | A1   | A1   | A3   | A4   | B1   | B1   | B2   | B3   |
+| 2          | A2   | x    | x    | x    | x    | B4   | B4   | x    | x    |
+
+Takes 9 cycles. 6 slots are wasted.
+
+### 6.9.2
+
+| CPU-FU \ Cycle | 1    | 2    | 3    | 4    | 5    |
+| -------------- | ---- | ---- | ---- | ---- | ---- |
+| 1-1            | A1   | A1   | A1   | A3   | A4   |
+| 1-2            | A2   | x    | x    | x    | x    |
+| 2-1            | B1   | B1   | B2   | B3   | x    |
+| 2-2            | B4   | B4   | x    | x    | x    |
+
+Takes 5 cycles. 8 slots are wasted.
+
+### 6.9.3
+
+| FU \ Cycle | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    |
+| ---------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| 1          | A1   | A1   | A1   | A3   | A4   | B2   | B3   | B4   | B4   |
+| 2          | x    | A2   | B1   | B1   | x    | x    | x    | x    | x    |
+
+Takes 9 cycles. 6 slots are wasted.
+
+### 6.9.4
+
+| FU \ Cycle | 1    | 2    | 3    | 4    | 5    | 6    |
+| ---------- | ---- | ---- | ---- | ---- | ---- | ---- |
+| 1          | A1   | A1   | A1   | A3   | B3   | A4   |
+| 2          | A2   | B1   | B1   | B2   | B4   | B4   |
+
+Takes 6 cycles. 0 slots wasted.
